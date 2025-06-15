@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/project_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/project_provider.dart';
 import '../../utils/app_colors.dart';
@@ -149,13 +150,30 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                                             const SizedBox(height: 12),
                                             Row(
                                               children: [
+                                                Container(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                                  decoration: BoxDecoration(
+                                                    color: _getStatusColor(project.status).withOpacity(0.1),
+                                                    borderRadius: BorderRadius.circular(12),
+                                                    border: Border.all(color: _getStatusColor(project.status)),
+                                                  ),
+                                                  child: Text(
+                                                    project.status.toString().split('.').last.toUpperCase(),
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: _getStatusColor(project.status),
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                                const Spacer(),
                                                 Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
                                                 const SizedBox(width: 4),
                                                 Text(
                                                   '${project.location.latitude.toStringAsFixed(2)}, ${project.location.longitude.toStringAsFixed(2)}',
                                                   style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                                                 ),
-                                                const Spacer(),
+                                                const SizedBox(width: 8),
                                                 Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey[600]),
                                               ],
                                             ),
@@ -184,5 +202,17 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         );
       },
     );
+  }
+
+  Color _getStatusColor(ProjectStatus status) {
+    switch (status) {
+      case ProjectStatus.pending:
+        return Colors.orange;
+      case ProjectStatus.ongoing:
+        return Colors.blue;
+      case ProjectStatus.completed:
+        return Colors.green;
+    }
+    return Colors.grey; // Default color
   }
 }

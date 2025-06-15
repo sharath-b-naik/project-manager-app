@@ -100,4 +100,82 @@ class ProjectProvider with ChangeNotifier {
       return null;
     }
   }
+
+  Future<void> updateProject({
+    required String projectId,
+    required String name,
+    required String description,
+    required LatLng location,
+  }) async {
+    try {
+      final project = _projects.firstWhere((p) => p.id == projectId);
+      final updatedProject = ProjectModel(
+        id: project.id,
+        userId: project.userId,
+        name: name,
+        description: description,
+        imageUrl: project.imageUrl,
+        location: location,
+        createdAt: project.createdAt,
+        images: project.images,
+        videos: project.videos,
+        status: project.status,
+      );
+
+      await _firestore.collection('projects').doc(projectId).update(updatedProject.toMap());
+
+      final index = _projects.indexWhere((p) => p.id == projectId);
+      if (index != -1) {
+        _projects[index] = updatedProject;
+        _filteredProjects = List.from(_projects);
+        notifyListeners();
+      }
+    } catch (e) {
+      print('Error updating project: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> deleteProject(String projectId) async {
+    try {
+      await _firestore.collection('projects').doc(projectId).delete();
+
+      _projects.removeWhere((p) => p.id == projectId);
+      _filteredProjects = List.from(_projects);
+      notifyListeners();
+    } catch (e) {
+      print('Error deleting project: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> updateProjectStatus(String projectId, ProjectStatus status) async {
+    try {
+      final project = _projects.firstWhere((p) => p.id == projectId);
+      final updatedProject = ProjectModel(
+        id: project.id,
+        userId: project.userId,
+        name: project.name,
+        description: project.description,
+        imageUrl: project.imageUrl,
+        location: project.location,
+        createdAt: project.createdAt,
+        images: project.images,
+        videos: project.videos,
+        status: status,
+      );
+
+      await _firestore.collection('projects').doc(projectId).update(updatedProject.toMap());
+
+      final index = _projects.indexWhere((p) => p.id == projectId);
+      if (index != -1) {
+        _projects[index] = updatedProject;
+        _filteredProjects = List.from(_projects);
+        notifyListeners();
+      }
+    } catch (e) {
+      print('Error updating project status: $e');
+      rethrow;
+    }
+  }
 }
